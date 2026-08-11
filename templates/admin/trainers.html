@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainer Management — GYMKHANA Admin{% endblock %}
+{% block page_title %}Gymkhana Certified Trainer Roster{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold m-0"><i class="bi bi-person-workspace text-danger me-2"></i> Trainer Staff Directory</h5>
+        <button class="btn btn-danger font-weight-bold" data-bs-toggle="modal" data-bs-target="#addTrainerModal">
+            <i class="bi bi-person-plus-fill me-1"></i> Add New Trainer
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-custom m-0">
+            <thead>
+                <tr>
+                    <th>Trainer Name</th>
+                    <th>Specialization</th>
+                    <th>Experience / Qualifications</th>
+                    <th>Phone</th>
+                    <th>Assigned Members</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if trainer_list %}
+                    {% for t in trainer_list %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ t.name }}</div>
+                                <small class="text-muted">{{ t.email }}</small>
+                            </td>
+                            <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">{{ t.specialization or 'General Fitness' }}</span></td>
+                            <td>
+                                <div>{{ t.experience or 'N/A' }} Exp</div>
+                                <small class="text-muted">{{ t.qualification or 'Certified' }}</small>
+                            </td>
+                            <td>{{ t.phone or '--' }}</td>
+                            <td><span class="badge bg-primary fs-6">{{ t.active_assigned_members }} Members</span></td>
+                            <td><span class="badge bg-success-subtle text-success border">{{ t.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No trainers created yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Trainer Modal -->
+<div class="modal fade" id="addTrainerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-person-plus text-danger me-2"></i> Create Trainer Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admin.trainers') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" placeholder="Sarah Jenkins" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="sarah@gymkhana.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" minlength="6" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 9876543210">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Specialization</label>
+                            <input type="text" name="specialization" class="form-control" placeholder="e.g. Strength Training & Bodybuilding">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Experience</label>
+                            <input type="text" name="experience" class="form-control" placeholder="e.g. 5 Years">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Qualifications</label>
+                            <input type="text" name="qualification" class="form-control" placeholder="e.g. CSCS / ACE Certified">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Create Trainer Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

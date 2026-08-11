@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Member Dashboard — GYMKHANA{% endblock %}
+{% block page_title %}Member Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="card border-0 bg-dark text-white rounded-4 p-4 mb-4 shadow-sm position-relative overflow-hidden">
+    <div class="d-flex align-items-center justify-content-between position-relative z-1">
+        <div>
+            <span class="badge bg-danger text-white mb-2 px-3 py-1 rounded-pill">MEMBER PORTAL</span>
+            <h2 class="fw-bold mb-1">Welcome back, {{ user.name }}! 👋</h2>
+            <p class="text-light opacity-75 mb-0">Track your daily fitness goals, active membership, and stay on top of your workout routines.</p>
+        </div>
+        <div class="d-none d-md-block text-end">
+            <a href="{{ url_for('progress.index') }}" class="btn btn-danger font-weight-bold px-4 py-2 rounded-3 shadow">
+                <i class="bi bi-plus-circle me-1"></i> Log Weight & Measurements
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Top KPI Summary Cards Grid -->
+<div class="row g-3 mb-4">
+    <!-- Membership Status Card -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-blue p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-secondary small font-weight-semibold">Active Plan</span>
+                <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-card-checklist"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold m-0">{{ subscription.plan_name if subscription else 'No Plan' }}</h4>
+            <div class="mt-2 d-flex align-items-center justify-content-between">
+                <span class="badge badge-{{ 'active' if status_label == 'Active' else ('expiring' if status_label == 'Expiring Soon' else 'expired') }}">
+                    {{ status_label }}
+                </span>
+                <small class="text-muted">{{ remaining_days }} days left</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight & BMI Card -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-green p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-secondary small font-weight-semibold">Current Weight / BMI</span>
+                <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-speedometer"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold m-0">{{ current_weight }} <small class="fs-6 text-muted">kg</small></h4>
+            <div class="mt-2 d-flex align-items-center justify-content-between">
+                <span class="small fw-semibold text-success">BMI: {{ bmi }}</span>
+                <span class="badge bg-light text-dark border">{{ bmi_category }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Workout Completion Card -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-amber p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-secondary small font-weight-semibold">Today's Workout</span>
+                <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-activity"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold m-0">{{ completion_pct }}% <small class="fs-6 text-muted">Done</small></h4>
+            <div class="progress mt-2" style="height: 6px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ completion_pct }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Calorie Target Card -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-purple p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-secondary small font-weight-semibold">Daily Calorie Target</span>
+                <div class="stat-icon-wrapper bg-purple bg-opacity-10 text-purple">
+                    <i class="bi bi-fire"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold m-0">{{ diet_plan.calories if diet_plan else '--' }} <small class="fs-6 text-muted">kcal</small></h4>
+            <div class="mt-2 extra-small text-muted text-truncate">
+                Goal: {{ diet_plan.goal if diet_plan else 'Not assigned' }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Row: Workout & Diet Schedule + Progress Chart -->
+<div class="row g-4">
+    <!-- Today's Assigned Exercises -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-journal-check text-danger me-2"></i> Today's Workout Schedule</h5>
+                <a href="{{ url_for('workout.my_workout') }}" class="btn btn-sm btn-outline-danger font-weight-semibold">View Full Plan</a>
+            </div>
+
+            {% if today_exercises %}
+                <div class="list-group list-group-flush border-0">
+                    {% for ex in today_exercises %}
+                        <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between border-bottom">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ ex.exercise_name }}</h6>
+                                <span class="badge bg-light text-secondary border me-2">{{ ex.muscle_group }}</span>
+                                <small class="text-muted">{{ ex.sets }} Sets × {{ ex.reps }} Reps @ {{ ex.weight or 'BW' }}</small>
+                            </div>
+                            <div>
+                                {% if ex.is_completed %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary border px-3 py-1">Pending</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-check fs-1 opacity-50 d-block mb-2"></i>
+                    <p class="mb-0">No workout assigned for today. Contact your assigned trainer or explore exercise plans.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Weight History Chart Preview -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-danger me-2"></i> Weight Progression Chart</h5>
+                <a href="{{ url_for('progress.index') }}" class="btn btn-sm btn-outline-secondary">Full Analytics</a>
+            </div>
+            <div class="chart-container">
+                <canvas id="weightChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('weightChart');
+    if (ctx) {
+        const weightData = {{ weight_history | tojson | safe }};
+        const labels = weightData.map(item => item.recorded_at);
+        const weights = weightData.map(item => item.weight);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length ? labels : ['Week 1', 'Week 2', 'Current'],
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: weights.length ? weights : [80, 78.5, {{ current_weight if current_weight != '--' else 75 }}],
+                    borderColor: '#ff3b4e',
+                    backgroundColor: 'rgba(255, 59, 78, 0.1)',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

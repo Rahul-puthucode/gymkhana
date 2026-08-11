@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}403 — Access Denied{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <div class="display-1 text-danger fw-bold">403</div>
+    <h3 class="fw-bold mb-3">Access Denied / Unauthorized</h3>
+    <p class="text-secondary mb-4">You do not have permission to view or access this resource.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-danger px-4 fw-bold">Return to Home</a>
+</div>
+{% endblock %}

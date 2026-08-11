@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard — GYMKHANA{% endblock %}
+{% block page_title %}System Administration & Analytics Overview{% endblock %}
+
+{% block content %}
+<!-- KPI Stat Cards Row 1 -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-blue p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Total Members</span>
+            <h3 class="fw-bold m-0 mt-1 text-primary">{{ total_members }}</h3>
+            <small class="text-muted mt-2 d-block">Registered member accounts</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-green p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Active Subscriptions</span>
+            <h3 class="fw-bold m-0 mt-1 text-success">{{ active_subs }}</h3>
+            <small class="text-muted mt-2 d-block">Valid recurring memberships</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-amber p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Expiring Soon (7 Days)</span>
+            <h3 class="fw-bold m-0 mt-1 text-warning">{{ expiring_soon }}</h3>
+            <small class="text-muted mt-2 d-block">Needs renewal attention</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-purple p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Total System Revenue</span>
+            <h3 class="fw-bold m-0 mt-1 text-purple">₹{{ "%.0f"|format(total_revenue) }}</h3>
+            <small class="text-muted mt-2 d-block">All-time subscriptions total</small>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Stat Cards Row 2 -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-md-4">
+        <div class="card bg-white border p-3 rounded-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary small">Total Certified Trainers</span>
+                    <h4 class="fw-bold m-0 text-dark">{{ total_trainers }}</h4>
+                </div>
+                <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+        <div class="card bg-white border p-3 rounded-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary small">Expired Subscriptions</span>
+                    <h4 class="fw-bold m-0 text-danger">{{ expired_subs }}</h4>
+                </div>
+                <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-md-4">
+        <div class="card bg-white border p-3 rounded-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-secondary small">Total Gym Branches</span>
+                    <h4 class="fw-bold m-0 text-dark">{{ total_branches }}</h4>
+                </div>
+                <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-pin-map-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Visualizations Row -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-danger me-2"></i> Membership Status Distribution</h5>
+            <div class="chart-container d-flex align-items-center justify-content-center">
+                <canvas id="adminSubPieChart" style="max-height: 260px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line-fill text-primary me-2"></i> System Metrics Summary</h5>
+            <div class="chart-container">
+                <canvas id="adminMetricsBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent System Registrations & Subscriptions -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-person-plus text-danger me-2"></i> Recent User Registrations</h5>
+                <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-danger">Manage Users</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-custom m-0">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ u.name }}</div>
+                                    <small class="text-muted">{{ u.email }}</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ u.role_name }}</span></td>
+                                <td><span class="badge bg-success-subtle text-success border">{{ u.status }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-receipt text-danger me-2"></i> Recent Subscriptions</h5>
+                <a href="{{ url_for('admin.subscriptions') }}" class="btn btn-sm btn-outline-danger">All Subscriptions</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-custom m-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Plan</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in recent_subscriptions %}
+                            <tr>
+                                <td class="fw-bold">{{ sub.member_name }}</td>
+                                <td>{{ sub.plan_name }}</td>
+                                <td class="fw-bold text-danger">₹{{ "%.0f"|format(sub.amount) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Subscription Pie Chart
+    const ctxP = document.getElementById('adminSubPieChart');
+    if (ctxP) {
+        new Chart(ctxP, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active Subscriptions', 'Expired Subscriptions', 'Expiring Soon'],
+                datasets: [{
+                    data: [{{ active_subs }}, {{ expired_subs }}, {{ expiring_soon }}],
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    // System Metrics Bar Chart
+    const ctxB = document.getElementById('adminMetricsBarChart');
+    if (ctxB) {
+        new Chart(ctxB, {
+            type: 'bar',
+            data: {
+                labels: ['Members', 'Trainers', 'Branches', 'Active Subs'],
+                datasets: [{
+                    label: 'Count',
+                    data: [{{ total_members }}, {{ total_trainers }}, {{ total_branches }}, {{ active_subs }}],
+                    backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#ff3b4e']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+});
+</script>
+{% endblock %}

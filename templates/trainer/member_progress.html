@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Member Progress Monitoring — GYMKHANA{% endblock %}
+{% block page_title %}Trainer Monitoring — Member Progress Records{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line text-danger me-2"></i> All Member Measurement Logs</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-custom m-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Member Name</th>
+                    <th>Weight</th>
+                    <th>Height</th>
+                    <th>BMI</th>
+                    <th>Waist</th>
+                    <th>Chest</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if progress_list %}
+                    {% for item in progress_list %}
+                        <tr>
+                            <td>{{ item.recorded_at }}</td>
+                            <td class="fw-bold text-dark">{{ item.member_name }}</td>
+                            <td class="text-danger fw-bold">{{ item.weight }} kg</td>
+                            <td>{{ item.height }} cm</td>
+                            <td><span class="badge bg-light text-dark border">{{ item.bmi }}</span></td>
+                            <td>{{ item.waist or '--' }} cm</td>
+                            <td>{{ item.chest or '--' }} cm</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No progress entries logged yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

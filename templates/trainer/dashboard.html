@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainer Dashboard — GYMKHANA{% endblock %}
+{% block page_title %}Trainer Overview & Member Tracking{% endblock %}
+
+{% block content %}
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-blue p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Assigned Members</span>
+            <h3 class="fw-bold m-0 mt-1">{{ total_assigned }}</h3>
+            <small class="text-muted mt-2 d-block">Total managed athletes</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-green p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Active Members</span>
+            <h3 class="fw-bold m-0 mt-1 text-success">{{ active_members }}</h3>
+            <small class="text-muted mt-2 d-block">Valid subscription status</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-amber p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Active Workout Plans</span>
+            <h3 class="fw-bold m-0 mt-1 text-warning">{{ workout_plans_count }}</h3>
+            <small class="text-muted mt-2 d-block">Active gym routines</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card card-gym-stat stat-purple p-3 h-100">
+            <span class="text-secondary small font-weight-semibold">Active Diet Plans</span>
+            <h3 class="fw-bold m-0 mt-1 text-purple">{{ diet_plans_count }}</h3>
+            <small class="text-muted mt-2 d-block">Nutrition macro targets</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Assigned Members Summary -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold m-0"><i class="bi bi-people-fill text-danger me-2"></i> My Assigned Members</h5>
+                <a href="{{ url_for('trainer.my_members') }}" class="btn btn-sm btn-outline-danger">View All Members</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-custom m-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Gender / Phone</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if members %}
+                            {% for m in members %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ m.name }}</div>
+                                        <small class="text-muted">{{ m.email }}</small>
+                                    </td>
+                                    <td>
+                                        <small class="d-block">{{ m.gender or 'N/A' }}</small>
+                                        <small class="text-muted">{{ m.phone or 'No phone' }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ 'active' if m.sub_status == 'active' else 'expired' }}">
+                                            {{ m.sub_status or 'No Sub' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('trainer.member_detail', member_id=m.id) }}" class="btn btn-sm btn-danger fw-bold">
+                                            Manage Profile & Plans
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No members assigned yet. Explore the member directory to manage athletes.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Member Workout Activity Feed -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-activity text-danger me-2"></i> Recent Member Progress Log</h5>
+            <div class="list-group list-group-flush border-0">
+                {% if recent_activity %}
+                    {% for act in recent_activity %}
+                        <div class="list-group-item px-0 py-3 border-bottom">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <strong class="text-dark small">{{ act.member_name }}</strong>
+                                <small class="text-muted extra-small">{{ act.completed_at }}</small>
+                            </div>
+                            <div class="small text-secondary">
+                                Completed exercise: <span class="fw-bold text-danger">{{ act.exercise_name }}</span>
+                                ({{ act.actual_weight or 'BW' }} kg × {{ act.actual_reps or 0 }} reps)
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-clock-history fs-2 d-block opacity-50 mb-2"></i>
+                        <p class="mb-0">No recent workout completions logged today.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Workout Plans Directory — GYMKHANA{% endblock %}
+{% block page_title %}Trainer Workout Plans Directory{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <h5 class="fw-bold mb-3"><i class="bi bi-journal-check text-danger me-2"></i> Created Workout Programs</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-custom m-0">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Assigned Member</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if plans %}
+                    {% for p in plans %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ p.name }}</td>
+                            <td><span class="fw-semibold text-danger">{{ p.member_name }}</span></td>
+                            <td>{{ p.start_date }} to {{ p.end_date }}</td>
+                            <td><span class="badge bg-success-subtle text-success border">Active</span></td>
+                            <td>{{ p.created_at }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No workout plans created yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

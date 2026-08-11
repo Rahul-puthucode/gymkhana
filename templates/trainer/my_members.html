@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}My Assigned Members — GYMKHANA{% endblock %}
+{% block page_title %}Member Directory & Management{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <h5 class="fw-bold m-0"><i class="bi bi-people-fill text-danger me-2"></i> Gymkhana Members List</h5>
+        
+        <form action="{{ url_for('trainer.my_members') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Search by name, email..." value="{{ search }}">
+            <button type="submit" class="btn btn-danger fw-bold"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-custom m-0">
+            <thead>
+                <tr>
+                    <th>Member Profile</th>
+                    <th>Contact Info</th>
+                    <th>Height / Weight</th>
+                    <th>Current Membership</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if members %}
+                    {% for m in members %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold" style="width:36px; height:36px;">
+                                        {{ m.name[0] | upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ m.name }}</div>
+                                        <small class="text-muted">{{ m.gender or 'N/A' }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>{{ m.email }}</div>
+                                <small class="text-muted">{{ m.phone or 'No phone' }}</small>
+                            </td>
+                            <td>
+                                <small class="d-block">{{ m.height or '--' }} cm</small>
+                                <small class="text-muted">{{ m.weight or '--' }} kg</small>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">{{ m.plan_name or 'No Active Plan' }}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ 'active' if m.sub_status == 'active' else 'expired' }}">
+                                    {{ m.sub_status or 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('trainer.member_detail', member_id=m.id) }}" class="btn btn-sm btn-danger fw-bold">
+                                    <i class="bi bi-journal-text me-1"></i> View Details & Assign Plans
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No members match your search parameters.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

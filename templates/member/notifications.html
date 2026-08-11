@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications — GYMKHANA{% endblock %}
+{% block page_title %}System & In-App Notifications{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold m-0"><i class="bi bi-bell-fill text-danger me-2"></i> All Notifications</h5>
+        {% if notifications %}
+            <form action="{{ url_for('notification.mark_all_read') }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-check-all me-1"></i> Mark All as Read
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="list-group list-group-flush border-0">
+        {% if notifications %}
+            {% for notif in notifications %}
+                <div class="list-group-item px-0 py-3 border-bottom {% if not notif.is_read %}bg-light bg-opacity-50{% endif %} rounded-3 mb-2">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="stat-icon-wrapper {% if notif.type == 'success' %}bg-success text-success{% elif notif.type == 'warning' %}bg-warning text-warning{% else %}bg-danger text-danger{% endif %} bg-opacity-10 mt-1">
+                                <i class="bi bi-bell"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold m-0 text-dark">{{ notif.title }}</h6>
+                                <p class="text-secondary small mt-1 mb-1">{{ notif.message }}</p>
+                                <small class="text-muted extra-small"><i class="bi bi-clock me-1"></i> {{ notif.created_at }}</small>
+                            </div>
+                        </div>
+                        <div>
+                            {% if not notif.is_read %}
+                                <form action="{{ url_for('notification.mark_read', notif_id=notif.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-sm btn-light border text-danger font-weight-semibold">
+                                        Mark Read
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="badge bg-light text-muted border">Read</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-bell-slash fs-1 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">You have no notifications at this time.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

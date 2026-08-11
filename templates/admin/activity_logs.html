@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Activity Audit Logs — GYMKHANA Admin{% endblock %}
+{% block page_title %}System Action & Security Audit Logs{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-danger me-2"></i> Real-time Activity Trail</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle table-custom m-0">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr>
+                            <td><small class="text-muted">{{ log.created_at }}</small></td>
+                            <td class="fw-bold text-dark">{{ log.user_name or 'System/Anonymous' }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ log.role or 'N/A' }}</span></td>
+                            <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">{{ log.action }}</span></td>
+                            <td><small class="text-secondary">{{ log.description }}</small></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No activity logs stored yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

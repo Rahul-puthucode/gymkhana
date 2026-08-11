@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Gym Locations & Branch Finder — GYMKHANA{% endblock %}
+{% block page_title %}Gym Locations & Geolocation Branch Finder{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Map Canvas Container -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-3">
+            <div class="d-flex align-items-center justify-content-between mb-3 px-2">
+                <h5 class="fw-bold m-0"><i class="bi bi-map text-danger me-2"></i> Interactive Gym Branch Map</h5>
+                <button class="btn btn-sm btn-outline-danger" id="btnLocateMe">
+                    <i class="bi bi-crosshair me-1"></i> Detect My Location
+                </button>
+            </div>
+            <div id="gymMap"></div>
+        </div>
+    </div>
+
+    <!-- Branch List Cards Sidebar -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-building text-danger me-2"></i> Gymkhana Branches</h5>
+            <div class="overflow-auto" style="max-height: 440px;">
+                {% if branches %}
+                    {% for branch in branches %}
+                        <div class="card bg-light border-0 p-3 mb-3 branch-card" id="branchCard{{ branch.id }}">
+                            <h6 class="fw-bold text-dark m-0">{{ branch.name }}</h6>
+                            <small class="text-danger fw-bold d-block mt-1 distance-badge" id="dist{{ branch.id }}">
+                                Calculating distance...
+                            </small>
+                            <p class="text-secondary small mt-2 mb-1"><i class="bi bi-geo-alt me-1"></i> {{ branch.address }}</p>
+                            <p class="text-secondary small mb-1"><i class="bi bi-telephone me-1"></i> {{ branch.phone }}</p>
+                            <p class="text-secondary small mb-2"><i class="bi bi-clock me-1"></i> {{ branch.opening_hours }}</p>
+                            <span class="badge bg-white text-dark border align-self-start mb-3 extra-small">{{ branch.facilities }}</span>
+                            
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ branch.latitude }},{{ branch.longitude }}" 
+                               target="_blank" class="btn btn-danger btn-sm w-100 fw-bold">
+                                <i class="bi bi-sign-turn-right me-1"></i> Get Directions
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const branches = {{ branches | tojson | safe }};
+
+    // Default center (Palakkad / Kerala coordinates fallback)
+    let defaultLat = 10.7867;
+    let defaultLng = 76.6548;
+
+    if (branches.length > 0) {
+        defaultLat = branches[0].latitude;
+        defaultLng = branches[0].longitude;
+    }
+
+    const map = L.map('gymMap').setView([defaultLat, defaultLng], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markers = [];
+
+    // Add branch markers
+    branches.forEach(b => {
+        const marker = L.marker([b.latitude, b.longitude]).addTo(map);
+        marker.bindPopup(`
+            <div style="font-family: var(--font-primary);">
+                <strong style="color: #ff3b4e; font-size: 1rem;">${b.name}</strong><br>
+                <small>${b.address}</small><br>
+                <small><strong>Phone:</strong> ${b.phone}</small><br>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${b.latitude},${b.longitude}" target="_blank" style="display:inline-block; margin-top:5px; color:#ff3b4e; font-weight:bold;">Get Directions &rarr;</a>
+            </div>
+        `);
+        markers.push({ id: b.id, marker: marker, lat: b.latitude, lng: b.longitude });
+    });
+
+    // Haversine formula distance calculation (in km)
+    function calcDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth radius km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return (R * c).toFixed(1);
+    }
+
+    function updateDistances(userLat, userLng) {
+        branches.forEach(b => {
+            const dist = calcDistance(userLat, userLng, b.latitude, b.longitude);
+            const badge = document.getElementById('dist' + b.id);
+            if (badge) {
+                badge.innerHTML = `<i class="bi bi-send-fill me-1"></i> ${dist} km away`;
+            }
+        });
+    }
+
+    // Attempt geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const uLat = position.coords.latitude;
+            const uLng = position.coords.longitude;
+
+            // Add user pin marker
+            const userIcon = L.divIcon({
+                className: 'user-location-pin',
+                html: '<div style="background:#22c55e; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 10px rgba(34,197,94,0.8);"></div>'
+            });
+            L.marker([uLat, uLng], { icon: userIcon }).addTo(map).bindPopup("<b>Your Current Location</b>").openPopup();
+            map.setView([uLat, uLng], 11);
+            updateDistances(uLat, uLng);
+        }, err => {
+            console.log("Geolocation error or denied, using default branch calculations.");
+            updateDistances(defaultLat, defaultLng);
+        });
+    } else {
+        updateDistances(defaultLat, defaultLng);
+    }
+
+    document.getElementById('btnLocateMe')?.addEventListener('click', function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(p => {
+                map.setView([p.coords.latitude, p.coords.longitude], 12);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

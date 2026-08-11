@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}My Workout Plan — GYMKHANA{% endblock %}
+{% block page_title %}Personalized Workout Management{% endblock %}
+
+{% block content %}
+{% if plan %}
+    <!-- Workout Header Card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle px-3 py-1 rounded-pill mb-2">ACTIVE PROGRAM</span>
+                <h3 class="fw-bold m-0">{{ plan.name }}</h3>
+                <p class="text-secondary small mt-1 mb-0">{{ plan.description }}</p>
+            </div>
+            <div class="text-end">
+                <small class="text-muted d-block">Assigned Trainer</small>
+                <strong class="text-dark"><i class="bi bi-person-badge text-danger me-1"></i> {{ plan.trainer_name }}</strong>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="fw-semibold text-secondary small">Daily Completion Rate:</span>
+                    <div class="progress flex-grow-1" style="height: 10px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ completion_pct }}%;"></div>
+                    </div>
+                    <span class="fw-bold text-danger">{{ completion_pct }}%</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="badge bg-light text-dark border p-2">
+                    <i class="bi bi-calendar-range me-1"></i> {{ plan.start_date }} to {{ plan.end_date }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Workout Exercises Breakdown -->
+    {% if exercises_by_day %}
+        {% for day_title, ex_list in exercises_by_day.items() %}
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold text-danger mb-3"><i class="bi bi-calendar-event me-2"></i> {{ day_title }}</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-custom m-0">
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>Muscle Group</th>
+                                <th>Target Sets × Reps</th>
+                                <th>Target Weight</th>
+                                <th>Rest</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ex in ex_list %}
+                                <tr>
+                                    <td class="fw-bold">
+                                        {{ ex.exercise_name }}
+                                        {% if ex.instructions %}
+                                            <i class="bi bi-info-circle text-muted ms-1" title="{{ ex.instructions }}"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge bg-light text-secondary border">{{ ex.muscle_group }}</span></td>
+                                    <td>{{ ex.sets }} × {{ ex.reps }}</td>
+                                    <td>{{ ex.weight or 'Bodyweight' }}</td>
+                                    <td>{{ ex.rest_seconds }}s</td>
+                                    <td>
+                                        {% if ex.is_completed %}
+                                            <span class="badge bg-success-subtle text-success border">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Done ({{ ex.actual_weight or 'BW' }} kg)
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary border">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#logModal{{ ex.id }}">
+                                            <i class="bi bi-pencil-square me-1"></i> Log Result
+                                        </button>
+
+                                        <!-- Log Result Modal -->
+                                        <div class="modal fade" id="logModal{{ ex.id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 rounded-4">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-bold">Log Result — {{ ex.exercise_name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form action="{{ url_for('workout.complete_exercise') }}" method="POST">
+                                                        <div class="modal-body">
+                                                            <input type="hidden" name="workout_exercise_id" value="{{ ex.id }}">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold">Actual Weight Lifted (kg)</label>
+                                                                <input type="number" step="0.5" name="actual_weight" class="form-control" value="{{ ex.actual_weight or '' }}" placeholder="e.g. 50">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold">Actual Reps Completed</label>
+                                                                <input type="number" name="actual_reps" class="form-control" value="{{ ex.actual_reps or '' }}" placeholder="e.g. 10">
+                                                            </div>
+                                                            <div class="form-check form-switch mb-3">
+                                                                <input class="form-check-input" type="checkbox" name="completed" id="compSwitch{{ ex.id }}" {% if ex.is_completed %}checked{% endif %}>
+                                                                <label class="form-check-label fw-semibold" for="compSwitch{{ ex.id }}">Mark Exercise Completed Today</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-0">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-danger fw-bold">Save Log</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+        <i class="bi bi-activity text-danger display-3 mb-3"></i>
+        <h4 class="fw-bold">No Active Workout Plan</h4>
+        <p class="text-secondary small mb-0">Your assigned trainer will create and assign your personalized workout plan shortly.</p>
+    </div>
+{% endif %}
+
+<!-- Reference Exercise Library -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+    <h5 class="fw-bold mb-3"><i class="bi bi-book-fill text-danger me-2"></i> Gymkhana Exercise Reference Guide</h5>
+    <div class="row g-3">
+        {% for exercise in all_exercises %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card bg-light border-0 p-3 h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold m-0">{{ exercise.name }}</h6>
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle">{{ exercise.muscle_group }}</span>
+                    </div>
+                    <p class="text-secondary small mb-1">{{ exercise.description }}</p>
+                    <small class="text-muted"><i class="bi bi-gear me-1"></i> Equipment: {{ exercise.equipment }}</small>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

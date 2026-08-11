@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Gymkhana — Gym Management, Workout & Diet Tracking System{% endblock %}
+
+{% block public_content %}
+<!-- Hero Section -->
+<section id="home" class="hero-section text-center text-lg-start">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger px-3 py-2 rounded-pill mb-3">
+                    <i class="bi bi-fire me-1"></i> Premium Fitness & Gym Management Platform
+                </span>
+                <h1 class="display-4 fw-extrabold mb-3 text-white">
+                    Manage Your Fitness.<br>
+                    Track Your Progress.<br>
+                    <span class="text-danger">Transform Yourself.</span>
+                </h1>
+                <p class="lead text-light opacity-75 mb-4">
+                    Gymkhana connects gym members, certified trainers, and gym administrators into one powerful ecosystem. Track custom workouts, meal nutrition, BMI progression, and find nearest gym branches in real time.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-danger btn-lg px-4 shadow">
+                        <i class="bi bi-rocket-takeoff me-2"></i> Get Started Free
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Member Login
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card bg-dark text-white border-secondary border-opacity-50 p-4 shadow-lg rounded-4">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-shield-check text-danger me-2"></i> Quick Login</h4>
+                    <p class="text-secondary small mb-4">Select your role to explore demo accounts or register your profile.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-danger text-start p-3 rounded-3">
+                            <div class="fw-bold"><i class="bi bi-person-fill me-2"></i> Member Demo</div>
+                            <small class="text-muted">Access personalized workout plans, diet charts & fitness graphs</small>
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary text-start p-3 rounded-3">
+                            <div class="fw-bold"><i class="bi bi-person-workspace me-2"></i> Trainer Demo</div>
+                            <small class="text-muted">Assign workouts, manage diet targets & track member progress</small>
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-warning text-start p-3 rounded-3">
+                            <div class="fw-bold"><i class="bi bi-speedometer2 me-2"></i> Admin Portal</div>
+                            <small class="text-muted">Manage trainers, users, branches, subscriptions & system reports</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid Section -->
+<section id="features" class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center max-width-700 mx-auto mb-5">
+            <span class="text-danger fw-bold text-uppercase tracking-wider small">Core Capabilities</span>
+            <h2 class="display-6 fw-bold mt-1">Everything You Need to Reach Peak Performance</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger mb-3">
+                        <i class="bi bi-card-checklist"></i>
+                    </div>
+                    <h5 class="fw-bold">Gym Membership Plans</h5>
+                    <p class="text-secondary small">Flexible monthly, quarterly, and annual subscription tiers with auto-calculated expiry warnings and remaining days tracking.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary mb-3">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <h5 class="fw-bold">Personalized Workouts</h5>
+                    <p class="text-secondary small">Custom workout schedules designed by certified trainers with set/rep breakdown, rest intervals, and completion percentages.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success mb-3">
+                        <i class="bi bi-egg-fried"></i>
+                    </div>
+                    <h5 class="fw-bold">Macro & Diet Plans</h5>
+                    <p class="text-secondary small">Tailored calorie and macro target tracking with structured meal plans (Breakfast, Lunch, Dinner & Snacks) for lean muscle or weight loss.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning mb-3">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h5 class="fw-bold">Fitness & BMI Analytics</h5>
+                    <p class="text-secondary small">Record weight, chest, waist, arms, and thighs measurements over time. Dynamic Chart.js progress graphs generated automatically.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info mb-3">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <h5 class="fw-bold">Certified Trainer Support</h5>
+                    <p class="text-secondary small">Direct member-to-trainer assignments. Trainers monitor assigned members' progress and adjust fitness regimes in real time.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 shadow-sm rounded-4">
+                    <div class="stat-icon-wrapper bg-purple bg-opacity-10 text-purple mb-3">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <h5 class="fw-bold">Interactive Gym Finder</h5>
+                    <p class="text-secondary small">Locate nearby Gymkhana branches on Leaflet OpenStreetMap with browser GPS geolocation distance calculation & turn-by-turn directions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic Membership Plans Section -->
+<section id="plans" class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="text-danger fw-bold text-uppercase tracking-wider small">Pricing Options</span>
+            <h2 class="display-6 fw-bold mt-1">Gymkhana Membership Plans</h2>
+            <p class="text-secondary">Select a plan tailored to your fitness goals</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            {% if plans %}
+                {% for plan in plans %}
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center d-flex flex-column">
+                        <h4 class="fw-bold">{{ plan.name }}</h4>
+                        <div class="my-3">
+                            <span class="display-6 fw-extrabold text-danger">₹{{ "%.0f"|format(plan.price) }}</span>
+                            <span class="text-muted small">/ {{ plan.duration_months }} month{% if plan.duration_months > 1 %}s{% endif %}</span>
+                        </div>
+                        <p class="text-secondary small mb-4">{{ plan.description }}</p>
+                        <ul class="list-unstyled text-start small mb-4 flex-grow-1">
+                            {% if plan.benefits %}
+                                {% for benefit in plan.benefits.split('\n') %}
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> {{ benefit }}</li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Full Gym Floor Access</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Locker & Shower Facilities</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Trainer Guidance Included</li>
+                            {% endif %}
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-danger w-100 fw-bold rounded-pill">Choose Plan</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback Plan Display -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
+                        <h4 class="fw-bold">Monthly Pass</h4>
+                        <div class="my-3"><span class="display-6 fw-extrabold text-danger">₹1,500</span><span class="text-muted small">/ 1 month</span></div>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-danger w-100 rounded-pill">Select Plan</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
+                        <h4 class="fw-bold">Quarterly Pass</h4>
+                        <div class="my-3"><span class="display-6 fw-extrabold text-danger">₹4,000</span><span class="text-muted small">/ 3 months</span></div>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-danger w-100 rounded-pill">Select Plan</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Gym Branch Preview Section -->
+<section id="branches" class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="text-danger fw-bold text-uppercase tracking-wider small">Our Network</span>
+            <h2 class="display-6 fw-bold mt-1">Gymkhana Branch Locations</h2>
+        </div>
+        <div class="row g-4">
+            {% if branches %}
+                {% for branch in branches %}
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold text-danger"><i class="bi bi-building me-2"></i>{{ branch.name }}</h5>
+                        <p class="text-secondary small mb-2"><i class="bi bi-geo-alt me-2"></i>{{ branch.address }}</p>
+                        <p class="text-secondary small mb-2"><i class="bi bi-telephone me-2"></i>{{ branch.phone }}</p>
+                        <p class="text-secondary small mb-3"><i class="bi bi-clock me-2"></i>{{ branch.opening_hours }}</p>
+                        <span class="badge bg-light text-dark border align-self-start">{{ branch.facilities }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-5 bg-dark text-white">
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <h3 class="fw-bold text-white mb-3">Get in Touch with Gymkhana</h3>
+                <p class="text-secondary mb-4">Have questions about memberships, personal training, or facilities? Contact our administrative desk today.</p>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                    <div>
+                        <h6 class="m-0 fw-bold">Headquarters</h6>
+                        <span class="text-secondary small">Gymkhana Fitness Hub, Main Street Center</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="bi bi-telephone-fill text-danger fs-3"></i>
+                    <div>
+                        <h6 class="m-0 fw-bold">Phone Support</h6>
+                        <span class="text-secondary small">+91 98765 43210 / +91 98765 43211</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-secondary bg-opacity-25 border-0 p-4 rounded-4">
+                    <h5 class="fw-bold text-white mb-3">Quick Inquiry</h5>
+                    <form onsubmit="alert('Thank you for contacting Gymkhana! We will get back to you shortly.'); return false;">
+                        <div class="mb-3">
+                            <input type="text" class="form-control bg-dark border-secondary text-white" placeholder="Your Full Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control bg-dark border-secondary text-white" placeholder="Your Email Address" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control bg-dark border-secondary text-white" rows="3" placeholder="Message or Inquiry" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

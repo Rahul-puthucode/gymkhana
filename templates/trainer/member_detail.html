@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block title %}Member Details & Plan Assignment — GYMKHANA{% endblock %}
+{% block page_title %}Trainer Management Portal — Athlete Profile{% endblock %}
+
+{% block content %}
+<!-- Athlete Overview Card -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 64px; height: 64px;">
+                {{ member.name[0] | upper }}
+            </div>
+            <div>
+                <h3 class="fw-bold m-0">{{ member.name }}</h3>
+                <p class="text-secondary small mb-0"><i class="bi bi-envelope me-1"></i> {{ member.email }} | <i class="bi bi-telephone me-1"></i> {{ member.phone or 'No Phone' }}</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-danger font-weight-bold" data-bs-toggle="modal" data-bs-target="#assignWorkoutModal">
+                <i class="bi bi-journal-plus me-1"></i> Assign Workout Plan
+            </button>
+            <button class="btn btn-success font-weight-bold text-white" data-bs-toggle="modal" data-bs-target="#assignDietModal">
+                <i class="bi bi-egg-fried me-1"></i> Assign Diet Plan
+            </button>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row g-3 text-center">
+        <div class="col-6 col-md-3">
+            <div class="bg-light p-3 rounded-3 border">
+                <span class="text-muted extra-small text-uppercase tracking-wider d-block">Gender</span>
+                <span class="fs-5 fw-bold text-dark">{{ member.gender or 'N/A' }}</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-light p-3 rounded-3 border">
+                <span class="text-muted extra-small text-uppercase tracking-wider d-block">Height / Weight</span>
+                <span class="fs-5 fw-bold text-dark">{{ member.height or '--' }} cm / {{ member.weight or '--' }} kg</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-light p-3 rounded-3 border">
+                <span class="text-muted extra-small text-uppercase tracking-wider d-block">BMI Score</span>
+                <span class="fs-5 fw-bold text-danger">{{ bmi }} <small class="fs-6">({{ bmi_category }})</small></span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-light p-3 rounded-3 border">
+                <span class="text-muted extra-small text-uppercase tracking-wider d-block">Gym Membership</span>
+                <span class="badge badge-{{ 'active' if subscription and subscription.status == 'active' else 'expired' }} mt-1 fs-6">
+                    {{ subscription.plan_name if subscription else 'No Plan' }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Plans Grid -->
+<div class="row g-4 mb-4">
+    <!-- Active Workout Plan -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold text-danger mb-3"><i class="bi bi-activity me-2"></i> Current Workout Plan</h5>
+            {% if workout_plan %}
+                <h6 class="fw-bold">{{ workout_plan.name }}</h6>
+                <p class="text-secondary small mb-3">{{ workout_plan.description }}</p>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle small">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Exercise</th>
+                                <th>Sets × Reps</th>
+                                <th>Target Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for we in workout_exercises %}
+                                <tr>
+                                    <td><span class="badge bg-light text-dark border">{{ we.day }}</span></td>
+                                    <td class="fw-bold">{{ we.exercise_name }}</td>
+                                    <td>{{ we.sets }} × {{ we.reps }}</td>
+                                    <td>{{ we.weight or 'BW' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-activity fs-1 d-block opacity-50 mb-2"></i>
+                    <p class="mb-0">No active workout plan assigned to this member.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Active Diet Plan -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold text-success mb-3"><i class="bi bi-egg-fried me-2"></i> Current Diet Plan</h5>
+            {% if diet_plan %}
+                <h6 class="fw-bold">{{ diet_plan.name }}</h6>
+                <p class="text-secondary small mb-2">Goal: <strong>{{ diet_plan.goal }}</strong></p>
+                <div class="d-flex gap-2 mb-3 extra-small">
+                    <span class="badge bg-danger">Cal: {{ diet_plan.calories }} kcal</span>
+                    <span class="badge bg-primary">P: {{ diet_plan.protein }}g</span>
+                    <span class="badge bg-warning text-dark">C: {{ diet_plan.carbohydrates }}g</span>
+                    <span class="badge bg-purple">F: {{ diet_plan.fat }}g</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle small">
+                        <thead>
+                            <tr>
+                                <th>Meal</th>
+                                <th>Food Item</th>
+                                <th>Qty</th>
+                                <th>Cal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dm in diet_meals %}
+                                <tr>
+                                    <td><span class="badge bg-light text-dark border">{{ dm.meal_type }}</span></td>
+                                    <td class="fw-bold">{{ dm.food_name }}</td>
+                                    <td>{{ dm.quantity }}</td>
+                                    <td>{{ dm.calories }} kcal</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-egg-fried fs-1 d-block opacity-50 mb-2"></i>
+                    <p class="mb-0">No active diet plan assigned to this member.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Assign Workout Modal -->
+<div class="modal fade" id="assignWorkoutModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-journal-plus text-danger me-2"></i> Assign Workout Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('trainer.assign_workout') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="member_id" value="{{ member.id }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Plan Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. 4-Week Strength Routine" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" name="start_date" class="form-control" value="2026-08-11" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">End Date <span class="text-danger">*</span></label>
+                            <input type="date" name="end_date" class="form-control" value="2026-09-11" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Description / Goals</label>
+                            <textarea name="description" class="form-control" rows="2" placeholder="Focus on chest hyper-trophy and legs progressive overload."></textarea>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-danger border-bottom pb-2">Exercise Assignment Checklist</h6>
+                    <div class="row g-3" id="exerciseRows">
+                        <div class="col-12 exercise-item border-bottom pb-3">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-3">
+                                    <label class="form-label extra-small font-weight-bold">Day</label>
+                                    <input type="text" name="day[]" class="form-control form-control-sm" value="Day 1 — Chest & Triceps">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label extra-small font-weight-bold">Exercise</label>
+                                    <select name="exercise_id[]" class="form-select form-select-sm">
+                                        {% for ex in exercises_list %}
+                                            <option value="{{ ex.id }}">{{ ex.name }} ({{ ex.muscle_group }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label extra-small font-weight-bold">Sets</label>
+                                    <input type="number" name="sets[]" class="form-control form-control-sm" value="4">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label extra-small font-weight-bold">Reps</label>
+                                    <input type="text" name="reps[]" class="form-control form-control-sm" value="8-10">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label extra-small font-weight-bold">Weight</label>
+                                    <input type="text" name="weight[]" class="form-control form-control-sm" value="50 kg">
+                                    <input type="hidden" name="rest_seconds[]" value="60">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Assign Workout Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Diet Modal -->
+<div class="modal fade" id="assignDietModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-egg-fried text-success me-2"></i> Assign Diet Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('trainer.assign_diet') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="member_id" value="{{ member.id }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Diet Plan Title <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. High Protein Lean Mass Diet" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Goal</label>
+                            <input type="text" name="goal" class="form-control" placeholder="e.g. Muscle gain / Weight reduction">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Target Cal (kcal)</label>
+                            <input type="number" name="calories" class="form-control" value="2400" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Protein (g)</label>
+                            <input type="number" name="protein" class="form-control" value="160">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Carbs (g)</label>
+                            <input type="number" name="carbohydrates" class="form-control" value="250">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Fat (g)</label>
+                            <input type="number" name="fat" class="form-control" value="60">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" value="2026-08-11" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">End Date</label>
+                            <input type="date" name="end_date" class="form-control" value="2026-09-11" required>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-success border-bottom pb-2">Sample Meal Breakdown</h6>
+                    <div class="row g-2 align-items-center mb-2">
+                        <div class="col-md-3">
+                            <input type="text" name="meal_type[]" class="form-control form-control-sm" value="Breakfast">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="food_name[]" class="form-control form-control-sm" value="Oats + 3 Egg Whites">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="quantity[]" class="form-control form-control-sm" value="1 Bowl + 3 Eggs">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="meal_calories[]" class="form-control form-control-sm" value="450">
+                            <input type="hidden" name="meal_protein[]" value="30">
+                            <input type="hidden" name="meal_carbs[]" value="50">
+                            <input type="hidden" name="meal_fat[]" value="8">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success text-white fw-bold px-4">Assign Diet Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
