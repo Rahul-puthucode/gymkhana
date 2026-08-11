@@ -19,8 +19,11 @@ def create_app():
     app.config.from_object(Config)
 
     # Ensure upload directory exists
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'), exist_ok=True)
-
+    if not os.environ.get("VERCEL"):
+     os.makedirs(
+        os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'),
+        exist_ok=True
+    )
     # Initialize Database teardown context
     init_db(app)
 
