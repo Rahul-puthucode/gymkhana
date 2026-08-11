@@ -6,7 +6,7 @@ def get_db():
     """Get database connection - try MySQL first, fallback to SQLite if MySQL fails."""
     if 'db' not in g:
         # Check if MySQL can connect
-        db_type = os.environ.get('DB_TYPE', 'mysql').lower()
+        db_type = os.environ.get('DB_TYPE', 'sqlite' if os.environ.get('VERCEL') else 'mysql').lower()
         use_mysql = False
         
         if db_type == 'mysql':
